@@ -462,17 +462,17 @@ def main():
     if dna is None:
         dna, bias = inicializar_populacao(NUM_ROBOS)
         W = np.zeros((NUM_ROBOS, NUM_ROBOS), dtype=np.float64)
-
-    lider = {'entropia_global': 1.0, 'performance_media': 0.0}
-
-    if args.validacao:
-        media_acertos = validacao_cruzada(historico_one_hot, historico_lists, dna, bias, W, GERACOES, lider)
-        print(f"Validação cruzada - Média de acertos nas previsões: {media_acertos:.2f}")
-        return
-
-    dna, bias, W, performances, log_entropia, log_entropia_global, log_probabilidades, log_profundidades, log_vizinhos = treinar_modelo(
-        dna, bias, W, historico_one_hot, historico_lists, GERACOES, lider
-    )
+        lider = {'entropia_global': 1.0, 'performance_media': 0.0}
+        dna, bias, W, performances, log_entropia, log_entropia_global, log_probabilidades, log_profundidades, log_vizinhos = treinar_modelo(
+            dna, bias, W, historico_one_hot, historico_lists, GERACOES, lider
+        )
+    else:
+        # Modo rápido: apenas gerar previsões
+        log_entropia = []
+        log_entropia_global = []
+        log_probabilidades = []
+        log_profundidades = []
+        log_vizinhos = []
 
     # Previsões Finais
     previsoes = gerar_previsoes_finais(dna, bias, W, NUM_PREVISOES, NUM_PREVISAO_FINAL)
@@ -517,25 +517,7 @@ def main():
         pd.DataFrame({'Profundidades': log_profundidades}).to_excel('log_profundidades_otimizado.xlsx', index=False)
         pd.DataFrame({'Vizinhos': log_vizinhos}).to_excel('log_vizinhos_otimizado.xlsx', index=False)
 
-    # Plots
-    plt.figure(figsize=(10,4))
-    plt.plot(log_entropia, label='Entropia Local (Média do Enxame)')
-    plt.plot(log_entropia_global, label='Entropia Global Líder')
-    plt.xlabel('Rodada histórica (x Geração)')
-    plt.ylabel('Entropia (normalizada)')
-    plt.title('Evolução da Diversidade do Enxame TII (Otimizado)')
-    plt.legend()
-    plt.grid(True, alpha=0.5)
-    plt.show()
-
-    plt.figure(figsize=(12,4))
-    plt.bar(range(TOTAL_NUMEROS), prob_medias)
-    plt.xlabel('Número (0 a 99)')
-    plt.ylabel('Probabilidade média')
-    plt.title('Probabilidade adaptativa de cada número (Média TOP Organismos)')
-    plt.xticks(np.arange(0, TOTAL_NUMEROS, 5))
-    plt.grid(axis='y', alpha=0.5)
-    plt.show()
+    # ...plots removidos...
 
 
 if __name__ == '__main__':
